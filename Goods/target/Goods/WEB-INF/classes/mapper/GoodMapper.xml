@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="GoodMapper">
+    <!--插入物品-->
+    <insert id="save" parameterType="pd">
+        insert into
+        good(good_code,good_pid,good_name,good_unit,address,good_value,good_photo,good_remarks,good_num)
+        values(#{good_code},#{good_pid},#{good_name},#{good_unit},#{address},#{good_value},#{good_photo},#{good_remarks},#{good_num})
+    </insert>
+
+   <!--查找所有物品-->
+    <select id = "getAllGood" parameterType="pd" resultType="pd">
+        select
+          a.good_code,
+          a.good_pid,
+          a.good_name,
+          a.good_unit,
+          a.address,
+          a.good_value,
+          a.good_photo,
+          a.good_remarks,
+          a.good_num,
+          b.name
+        from good a left join  good_category b ON (a.good_pid=b.pid)
+    </select>
+    <!--查找物品-->
+    <select id = "getGood" parameterType="pd" resultType="pd">
+        select
+          a.good_code,
+          a.good_pid,
+          a.good_name,
+          a.good_unit,
+          a.address,
+          a.good_value,
+          a.good_photo,
+          a.good_remarks,
+          a.good_num,
+          b.name
+        from good a left join  good_category b ON (a.good_pid=b.pid)
+        where a.good_code = #{good_code}
+    </select>
+
+    <!--通过code删除-->
+    <delete id="deleteGood" parameterType="pd">
+        delete
+        from   good
+        where good_code = #{good_code}
+
+    </delete>
+
+    <!--多物品删除-->
+    <delete id="deleteGoods" parameterType="java.util.List">
+        delete  from good
+        where good_code in
+        <foreach collection="list" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </delete>
+    <update id="updateGood" parameterType="pd">
+        UPDATE
+          good
+        <set>
+            <if test="good_pid != null">
+                good_pid = #{good_pid},
+            </if>
+            <if test="good_name != null">
+                good_name = #{good_name},
+            </if>
+            <if test="good_unit != null">
+                good_unit = #{good_unit},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="good_value != null">
+                good_value = #{good_value},
+            </if>
+            <if test="good_remarks != null">
+                good_remarks = #{good_remarks},
+            </if>
+            <if test="good_num != null">
+                good_num = #{good_num},
+            </if>
+            <if test="good_photo != null">
+                good_photo = #{good_photo}
+            </if>
+
+        </set>
+        where good_code = #{good_code}
+    </update>
+    <!--出库-->
+    <update id="updateGoodNumout" parameterType="pd">
+        update
+          good
+        set good_num = good_num - #{num}
+        where good_code = #{good_code}
+    </update>
+    <!--入库-->
+    <update id="updateGoodNumin" parameterType="pd">
+        update
+        good
+        set good_num = good_num + #{num}
+        where good_code = #{good_code}
+    </update>
+    <!--外借-->
+    <update id="updateGoodout" parameterType="java.util.List">
+            <foreach collection="list" item="item" open="begin" separator=";" close=";end;">
+                update
+                  good
+                <set>
+                    num=num-#{item.num}
+                </set>
+                where good_code = #{item.good_code};
+            </foreach>
+    </update>
+
+</mapper>

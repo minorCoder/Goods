@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserMapper">
+    <!--插入用户-->
+    <insert id="save" parameterType="pd">
+        insert into
+        user(name,address,age,sex,ID_card,phone,username,password,email,role,reg_date,statue)
+        values(#{name}, #{address},#{age},#{sex},#{ID_card},#{phone},#{username},#{password},#{email},#{role},#{reg_date},1)
+    </insert>
+
+    <!--插入用户信息-->
+    <insert id="saveinfo" parameterType="pd">
+        insert into
+        user_info(id,arrears_amount,overdue)
+        values(#{id},#{arrears_amount},#{overdue})
+    </insert>
+    <!--通过用户名密码查找用户-->
+    <select id="getUser" parameterType="pd" resultType="pd">
+      select
+            a.id,
+            a.name,
+            a.address,
+            a.age,
+            a.sex,
+            a.sex,
+            a.ID_card,
+            a.phone,
+            a.username,
+            a.password,
+            a.email,
+            a.role,
+            a.reg_date,
+            a.last_login,
+            a.statue
+      from user a
+      where a.username = #{username} and a.password  = #{password}
+    </select>
+
+    <!--通过ID查找用户(包括具体信息)-->
+    <select id="getUserByID" parameterType="pd" resultType="pd">
+        select
+            a.id,
+            a.name,
+            a.address,
+            a.age,
+            a.sex,
+            a.sex,
+            a.ID_card,
+            a.phone,
+            a.username,
+            a.password,
+            a.email,
+            a.role,
+            a.reg_date,
+            a.last_login,
+            a.statue,
+            b.arrears_amount,
+            b.overdue
+        from user a, user_info b
+        where a.id = #{id} and a.id = b.id
+    </select>
+    <!--查找所有用户-->
+    <select id = "getAllUser" parameterType="pd" resultType="pd">
+        select
+            a.id,
+            a.name,
+            a.address,
+            a.age,
+            a.sex,
+            a.sex,
+            a.ID_card,
+            a.phone,
+            a.username,
+            a.password,
+            a.email,
+            a.role,
+            a.reg_date,
+            a.last_login,
+            b.role_name,
+            a.statue
+        from user a, role b
+        where a.role = b.role_id and username != 'admin'
+    </select>
+    <!--查找管理员用户-->
+    <select id = "getAllMangeUser" parameterType="pd" resultType="pd">
+        select
+        a.id,
+        a.name,
+        a.address,
+        a.age,
+        a.sex,
+        a.sex,
+        a.ID_card,
+        a.phone,
+        a.username,
+        a.password,
+        a.email,
+        a.role,
+        a.reg_date,
+        a.last_login,
+        b.role_name,
+        a.statue
+        from user a, role b
+        where a.role = b.role_id and username != 'admin' and a.role = 0
+    </select>
+    <!--获取用户名是否存在-->
+    <select id="getUsername" parameterType="pd" resultType="pd">
+        SELECT *
+        from user
+        where username = #{username}
+    </select>
+
+    <!--更新用户最后登录时间-->
+    <update id = "updateLastLogin" parameterType="pd">
+        update
+          user
+        set  last_login = #{LAST_LOGIN}
+        where username = #{username}
+    </update>
+
+    <!--停用-->
+    <update id = "updateStop" parameterType="pd">
+        update
+        user
+        set statue = 0
+        where id= #{id}
+    </update>
+    <!--启用-->
+    <update id = "updateStart" parameterType="pd">
+        update
+        user
+        set statue = 1
+        where id = #{id}
+    </update>
+    <!--更新密码-->
+    <update id = "updatePassword" parameterType="pd">
+        update
+        user
+        set password = #{newpassword}
+        where username = #{username}
+    </update>
+    <!--更新密码-->
+    <update id = "updateUser" parameterType="pd">
+        update
+        user
+        set
+        name = #{name},
+        sex = #{sex},
+        age = #{age},
+        phone = #{phone},
+        email = #{email},
+        ID_card = #{ID_card},
+        role = #{role},
+        address = #{address}
+        where username = #{username}
+    </update>
+    <!--用户逾期天数等更新-->
+    <update id = "updateInfo" parameterType="pd">
+        update user_info
+            set overdue = (
+                select ifnull(timestampdiff(day,rent_time,CURRENT_TIMESTAMP)+1-rent_date,0)
+                from rent
+                where user_id =#{id} and status = 0
+				)
+              and id = #{id}
+
+    </update>
+    <!--归还更新-->
+    <update id = "updaterevert" parameterType="pd">
+        update user_info
+        set overdue = 0,
+            arrears_amount = 0
+        and id = #{user_id}
+
+    </update>
+    <!--删除用户-->
+    <delete id ="deleteU" parameterType="pd">
+        delete from  user
+        where id = #{id}
+    </delete>
+
+    <!--多用户删除-->
+    <delete id="deleteMuchU" parameterType="java.util.List">
+        delete  from user
+            where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+                  #{id}
+        </foreach>
+    </delete>
+
+</mapper>

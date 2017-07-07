@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StackinMapper">
+    <!--插入入库记录-->
+    <insert id="save" parameterType="pd">
+        insert into
+        good_stackin(batchcode,good_code,num,creator_id,create_time,remark,storage)
+        values(#{batchcode},#{good_code},#{num},#{creator_id},#{create_time},#{remark},#{storage})
+    </insert>
+
+    <!--查找入库列表-->
+    <select id="getStackin" parameterType="pd" resultType="pd">
+        select
+        a.batchcode,
+        a.good_code,
+        a.num,
+        a.creator_id,
+        a.create_time,
+        a.remark,
+        b.storage_name,
+        c.good_name,
+        d.name
+        from good_stackin a,storage b,good c,user d
+        where a.batchcode = #{batchcode} and a.storage = b.storage_id and a.good_code = c.good_code and d.id = a.creator_id
+    </select>
+
+    <!--获取所有的入库-->
+    <select id="getAllStackin" parameterType="pd" resultType="pd">
+        select
+        a.batchcode,
+        a.good_code,
+        a.num,
+        a.creator_id,
+        a.create_time,
+        a.remark,
+        b.storage_name,
+        c.good_name,
+        d.name
+        from good_stackin a,storage b,good c,user d
+        where a.storage = b.storage_id and a.good_code = c.good_code and d.id = a.creator_id
+    </select>
+
+    <!--删除入库记录-->
+    <delete id = "deleteStackin" parameterType="pd">
+        delete
+        from good_stackin
+        where batchcode = #{batchcode}
+    </delete>
+    <!--批量入库删除-->
+    <delete id="deleteStackins" parameterType="java.util.List">
+        delete  from good_stackin
+        where batchcode in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

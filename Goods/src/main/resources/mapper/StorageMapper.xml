@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StorageMapper">
+    <!--插入仓库-->
+    <insert id="save" parameterType="pd">
+        insert into
+        storage(storage_id,storage_name,address)
+        values(#{storage_id},#{storage_name},#{address})
+    </insert>
+
+    <!--插入库存-->
+    <insert id="saveStack" parameterType="pd">
+        insert into
+        good_storage(storage_id,storage_name,good_id,num)
+        values(#{storage_id},#{storage_name},#{good_id},#{num})
+    </insert>
+
+   <!--查找所有库存-->
+    <select id = "getAllStorage" parameterType="pd" resultType="pd">
+        select
+          a.good_code,
+          a.good_pid,
+          a.good_name,
+          a.good_unit,
+          a.address,
+          a.good_value,
+          a.good_photo,
+          a.good_remarks,
+          a.good_num,
+          b.id,
+          b.num,
+          c.storage_id,
+          c.storage_name
+        from good a , good_storage b,storage c
+        where a.good_code=b.good_id and b.storage_id = c.storage_id
+    </select>
+    <!--查找库存-->
+    <select id = "getStack" parameterType="pd" resultType="pd">
+        select
+        storage_id,
+        good_id,
+        storage_name,
+        num
+        from good_storage
+        where  storage_id = #{storage_id} and good_id = #{good_id}
+    </select>
+    <!--查找所有仓库-->
+    <select id = "getStorages" parameterType="pd" resultType="pd">
+        select
+         storage_id,
+         storage_name,
+         address
+        from storage
+    </select>
+
+    <!--查找仓库-->
+    <select id = "getStorage" parameterType="pd" resultType="pd">
+        select
+        storage_id,
+        storage_name,
+        address
+        from storage
+        where storage_id = #{storage_id}
+    </select>
+
+    <!--通过仓库id获取库存-->
+    <select id = "getGoods" parameterType="pd" resultType="pd">
+        select
+        a.storage_id,
+        a.storage_name,
+        a.num,
+        b.good_name,
+        b.good_code
+        from good_storage a , good b
+        where b.good_code = a.good_id and a.storage_id = #{storage_id}
+    </select>
+
+    <!--通过仓库id删除-->
+    <delete id="deleteStorage" parameterType="pd">
+        delete
+        from  storage
+        where storage_id = #{storage_id}
+    </delete>
+
+    <!--多仓库删除-->
+    <delete id="deleteStorages" parameterType="java.util.List">
+        delete  from storage
+        where storage_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!--更新仓库-->
+    <update id="updateStorage" parameterType="pd">
+        UPDATE
+          storage
+        <set>
+            <if test="storage_name != null">
+                storage_name = #{storage_name},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+
+        </set>
+        where storage_id = #{storage_id}
+    </update>
+
+    <!--更新库存-->
+    <update id="updateStack" parameterType="pd">
+        UPDATE
+        good_storage
+        <set>
+
+            <if test="num != null">
+                num = num + #{num}
+            </if>
+
+        </set>
+        where storage_id = #{storage_id}
+    </update>
+
+    <!--出库存-->
+    <update id="updateStackout" parameterType="pd">
+        UPDATE
+        good_storage
+        <set>
+
+            <if test="num != null">
+                num = num - #{num}
+            </if>
+
+        </set>
+        where storage_id = #{storage_id}
+    </update>
+</mapper>
