@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CategoryMapper">
+    <!--插入分类-->
+    <insert id="save" parameterType="pd">
+        insert into
+        good_category(pid,name,message)
+        values(#{pid},#{name},#{message})
+    </insert>
+
+    <!--通过pid获得分类-->
+    <select id="getCategory" parameterType="pd" resultType="pd">
+        SELECT  pid,name,message
+        from good_category
+        where pid = #{pid}
+    </select>
+
+    <!--通过name获得分类-->
+    <select id="getCategoryByName" parameterType="pd" resultType="pd">
+        SELECT  pid,name,message
+        from good_category
+        where name = #{name}
+    </select>
+    <!--获得所有分类-->
+    <select id="getAllCategory" parameterType="pd" resultType="pd">
+        SELECT  pid,name,message
+        from good_category
+    </select>
+
+    <!--删除分类-->
+    <delete id="deleteCategory" parameterType="pd">
+        delete
+        from good_category
+        where pid = #{pid}
+    </delete>
+    <!--多分类删除-->
+    <delete id="deleteMuchCategory" parameterType="java.util.List">
+    delete  from good_category
+    where pid in
+    <foreach collection="list" item="pid" open="(" close=")" separator=",">
+        #{pid}
+    </foreach>
+    </delete>
+    <!--更新分类-->
+    <update id="updateCategory" parameterType="pd">
+        update good_category
+        set pid = #{newpid},name = #{name},message = #{message}
+        where pid = #{pid}
+    </update>
+
+</mapper>

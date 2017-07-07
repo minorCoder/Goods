@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReservationMapper">
+    <!--保存预约-->
+    <insert id="save" parameterType="pd">
+        insert into
+        reservation(reservation_id,reservation_da,reservator_id,reservation_date,status)
+        values(#{reservation_id},#{reservation_da},#{reservator_id},#{reservation_date},0)
+    </insert>
+    <insert id="save_reservation" parameterType="java.util.List">
+       insert into
+        reservation_good(reservation_id,good_code,num,value)
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+           (#{item.reservation_id},#{item.good_code},#{item.num},#{item.value})
+        </foreach>
+    </insert>
+    <!--所有用户预约-->
+    <select id="getAllReservation" parameterType="pd" resultType="pd">
+        select
+          a.reservation_id,
+          a.reservator_id,
+          a.reservation_da,
+          a.reservation_date,
+          a.status,
+          b.name,
+          b.username
+        from reservation a,user b
+        where a.reservator_id = b.id
+    </select>
+    <!--获取预约物品-->
+    <select id="getReservation_good" parameterType="pd" resultType="pd">
+        select
+        a.reservation_id,
+        a.good_code,
+        a.num,
+        a.value,
+        b.good_name
+        from reservation_good a,good b
+        where a.good_code = b.good_code and reservation_id = #{reservation_id}
+    </select>
+    <!--审核更新-->
+    <update id="updateReservation" parameterType="pd">
+        update reservation
+        set status = 1
+        where reservation_id =#{reservation_id}
+    </update>
+    <!--获取某用户的预约-->
+    <select id="getReservation" parameterType="pd" resultType="pd">
+         select
+          a.reservation_id,
+          a.reservator_id,
+          a.reservation_date,
+          reservation_da,
+          a.status,
+          b.name,
+          b.username
+        from reservation a,user b
+        where a.reservator_id = b.id and a.reservation_id = #{reservation_id}
+    </select>
+    <!--查看用户是否有预约-->
+    <select id="getisReservation" parameterType="pd" resultType="pd">
+        select
+          reservation_id
+        from reservation
+        where reservator_id = #{reservator_id} and status = 0
+    </select>
+    <!--查找某个用户的预约-->
+    <select id="getreservationById" parameterType="pd" resultType="pd">
+        select
+          a.reservation_id,
+          a.reservator_id,
+          a.reservation_date,
+          reservation_da,
+          a.status,
+          b.name,
+          b.username
+        from reservation a,user b
+        where a.reservator_id = b.id and a.reservator_id = #{reservator_id}
+
+    </select>
+    <!--删除预约的物品-->
+    <delete id="deleteReservation_good" parameterType="pd">
+        delete from reservation_good
+        where reservation_id = #{reservation_id}
+    </delete>
+    <!--删除预约-->
+    <delete id="deleteReservation" parameterType="pd">
+        delete from reservation
+        where reservation_id = #{reservation_id}
+    </delete>
+    <!--批量删除预约物品-->
+    <delete id = "deleteReservation_goods" parameterType="java.util.List">
+        delete from reservation_good
+        where reservation_id in
+        <foreach collection="list" item="var"  open="(" close=")" separator=",">
+            #{var}
+        </foreach>
+    </delete>
+    <!--批量预约删除-->
+    <delete id = "deleteReservations" parameterType="java.util.List">
+    delete from reservation
+    where reservation_id in
+    <foreach collection="list" item="var"  open="(" close=")" separator=",">
+        #{var}
+    </foreach>
+    </delete>
+</mapper>

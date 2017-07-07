@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RevertMapper">
+    <!--插入物品-->
+    <insert id="saverevert" parameterType="pd">
+        insert into
+        revert(user_id,rent_id,revert_time,deposit,hire,overdue,arrears_amount)
+        values(#{user_id},#{rent_id},#{revert_time},#{deposit},#{hire},#{overdue},#{arrears_amount})
+    </insert>
+
+   <!--查找所有归还记录-->
+    <select id = "getAllRevert" parameterType="pd" resultType="pd">
+        select
+          a.revert_id,
+          a.rent_id,
+          a.revert_time,
+          a.deposit,
+          a.hire,
+          overdue,
+          arrears_amount,
+          a.user_id,
+          b.name,
+          b.username,
+          c.rent_date,
+          c.deposit
+          from  revert a,user b,rent c
+          where a.user_id = b.id and c.rent_id = a.rent_id
+    </select>
+    <!--查找所有归还记录-->
+    <select id = "getreservationById" parameterType="pd" resultType="pd">
+        select
+        a.revert_id,
+        a.rent_id,
+        a.revert_time,
+        a.deposit,
+        a.hire,
+        overdue,
+        arrears_amount,
+        a.user_id,
+        b.name,
+        b.username,
+        c.rent_date,
+        c.deposit
+        from  revert a,user b,rent c
+        where a.user_id = b.id and a.user_id = #{user_id}
+    </select>
+    <!--查找某个借用账单-->
+    <select id = "getRent" parameterType="pd" resultType="pd">
+        select
+        a.rent_id,
+        a.user_id,
+        a.rent_time,
+        a.rent_date,
+        a.deposit,
+        a.hire,
+        a.status,
+        b.username,
+        b.name,
+        b.ID_card,
+        b.phone
+        from  rent a,user b
+        where a.user_id = b.id and a.rent_id = #{rent_id}
+    </select>
+    <!--查找借用信息-->
+    <select id="getrent_good" parameterType="pd" resultType="pd">
+        select
+            b.good_code,
+            b.good_name,
+            a.num,
+            a.value
+        from rent_good a,good b
+        where a.good_code = b.good_code and a.rent_id = #{rent_id}
+    </select>
+
+    <!--根据revert_id删除revert记录-->
+    <delete id="delete" parameterType="pd">
+    delete from
+      revert
+    where revert_id = #{revert_id}
+    </delete>
+
+
+    <!--根据revert_id删除revert记录-->
+    <delete id="deleteReverts" parameterType="java.util.List">
+        delete from
+        revert
+        where revert_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

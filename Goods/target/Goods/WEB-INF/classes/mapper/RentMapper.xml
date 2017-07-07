@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RentMapper">
+    <!--插入物品-->
+    <insert id="save" parameterType="pd">
+        insert into
+        rent(rent_id,user_id,rent_time,rent_date,deposit,hire,status)
+        values(#{rent_id},#{user_id},#{rent_time},#{rent_date},#{deposit},#{hire},0)
+    </insert>
+
+    <!--批量插入-->
+    <insert id="save_rent"  parameterType="java.util.List">
+        insert into rent_good (rent_id,good_code,num,value)
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.rent_id},#{item.good_code},#{item.num},#{item.value})
+        </foreach>
+    </insert>
+   <!--查找所有借用账单-->
+    <select id = "getAllRent" parameterType="pd" resultType="pd">
+        select
+          a.rent_id,
+          a.user_id,
+          a.rent_time,
+          a.rent_date,
+          a.deposit,
+          a.hire,
+          a.status,
+          b.username,
+          b.name,
+          b.ID_card,
+          b.phone
+          from  rent a,user b
+          where a.user_id = b.id
+    </select>
+    <!--用户借用记录-->
+    <select id = "getreservationById" parameterType="pd" resultType="pd">
+        select
+        a.rent_id,
+        a.user_id,
+        a.rent_time,
+        a.rent_date,
+        a.deposit,
+        a.hire,
+        a.status,
+        b.username,
+        b.name,
+        b.ID_card,
+        b.phone
+        from  rent a,user b
+        where a.user_id = b.id and user_id = #{user_id}
+    </select>
+    <!--查找某个借用账单-->
+    <select id = "getRent" parameterType="pd" resultType="pd">
+        select
+        a.rent_id,
+        a.user_id,
+        a.rent_time,
+        a.rent_date,
+        a.deposit,
+        a.hire,
+        a.status,
+        b.username,
+        b.name,
+        b.ID_card,
+        b.phone
+        from  rent a,user b
+        where a.user_id = b.id and a.rent_id = #{rent_id}
+    </select>
+    <!--查找借用信息-->
+    <select id="getrent_good" parameterType="pd" resultType="pd">
+        select
+            b.good_code,
+            b.good_name,
+            a.num,
+            a.value
+        from rent_good a,good b
+        where a.good_code = b.good_code and a.rent_id = #{rent_id}
+    </select>
+    <select id="getisrent" parameterType="pd" resultType="pd">
+        select
+          rent_id
+        from rent
+        where user_id = #{user_id} and status = 0
+    </select>
+    <!--删除rent_goode-->
+    <delete id="deleteRent_good" parameterType="pd">
+    delete from
+      rent_good
+      where rent_id = #{rent_id}
+    </delete>
+
+    <!--根据rent_id删除rent记录-->
+    <delete id="deleteRent" parameterType="pd">
+    delete from
+      rent
+    where rent_id = #{rent_id}
+    </delete>
+
+    <!--批量删除rent_goode-->
+    <delete id="deleteRent_goods" parameterType="java.util.List">
+        delete from
+        rent_good
+        where rent_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量rent记录-->
+    <delete id="deleteRents" parameterType="java.util.List">
+        delete from
+        rent
+        where rent_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </delete>
+
+
+
+    <update id="updateStatus" parameterType="pd">
+        update
+        rent
+        set status = 1
+        where rent_id = #{rent_id}
+
+    </update>
+
+</mapper>
